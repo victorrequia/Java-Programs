@@ -1,17 +1,36 @@
 package dados;
 
+import exceptions.CleanException;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class CalculadoraEstatistica implements ISequencia {
     
+    private Gerador geradores[] = new Gerador[] {new Fibonacci(), new Naturais(), new Fatoriais()};
     private static CalculadoraEstatistica instance = null;
     protected List<Integer> sequencia = new LinkedList();
     
     private CalculadoraEstatistica(){
         
+    }
+    
+    public void gerar(GerarTipo tipo, int n){
+        switch(tipo){
+            case FIBONACCI:
+                geradores[0].gerar(n);
+                this.sequencia.addAll(geradores[0].getSequence());
+                break;
+            case NATURAL:
+                geradores[1].gerar(n);
+                this.sequencia.addAll(geradores[1].getSequence());
+                break;
+            case FATORIAL:
+                geradores[2].gerar(n);
+                this.sequencia.addAll(geradores[2].getSequence());
+                break;
+        }
     }
     
     public static CalculadoraEstatistica getInstance(){
@@ -34,13 +53,20 @@ public class CalculadoraEstatistica implements ISequencia {
         sequencia.add(valor);
     }
     
-    public void limparValores(){
-        sequencia.clear();
+    public void limparValores() throws CleanException{
+        if(sequencia.size() > 0){
+            sequencia.clear();
+        }else{
+            throw new CleanException();
+        }
     }
     
-    public void tirar(){
-        if(sequencia.size()>0)
+    public void tirar() throws CleanException{
+        if(sequencia.size()>0){
             sequencia.remove(sequencia.size()-1);
+        }else{
+            throw new CleanException();
+        }
     }
     
     @Override

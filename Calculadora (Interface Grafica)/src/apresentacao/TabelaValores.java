@@ -2,12 +2,20 @@ package apresentacao;
 
 import javax.swing.table.AbstractTableModel;
 import dados.CalculadoraEstatistica;
+import dados.GerarTipo;
+import exceptions.CleanException;
 
 public class TabelaValores extends AbstractTableModel{
     
     private String[] colunas = {"Valores"};
     private CalculadoraEstatistica calculadora = CalculadoraEstatistica.getInstance();
 
+    public void gerar(GerarTipo tipo, int n){
+        calculadora.getValores().clear();
+        calculadora.gerar(tipo, n);
+        fireTableStructureChanged();
+    }
+    
     @Override
     public int getRowCount() {
         return calculadora.getValores().size();
@@ -33,19 +41,12 @@ public class TabelaValores extends AbstractTableModel{
         fireTableStructureChanged();
     }
     
-    /*public void adicionarValores(int[] valores){
-        for(int i=0; i<valores.length; i++){
-            calculadora.adicionarValor(valores[i]);
-            fireTableStructureChanged();
-        }
-    }*/
-    
-    public void limpar(){
+    public void limpar() throws CleanException{
         calculadora.limparValores();
         fireTableStructureChanged();
     }
     
-    public void tirar(){
+    public void tirar()throws CleanException{
         calculadora.tirar();
         fireTableStructureChanged();
     }

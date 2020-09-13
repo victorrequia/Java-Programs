@@ -3,12 +3,19 @@ package apresentacao;
 import dados.CalculadoraEstatistica;
 import dados.Fatoriais;
 import dados.Fibonacci;
+import dados.GerarTipo;
 import dados.Naturais;
+import exceptions.CleanException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -23,19 +30,14 @@ public class Calculadora extends JFrame{
     private JScrollPane painelScrollTabelaResultado = new JScrollPane();
     private JScrollPane painelScrollTabelaValores = new JScrollPane();
     
-    private JLabel infoCaixaEntrada = new JLabel("Digite um valor:");
     private JTextField caixaEntrada = new JTextField();
     
-    private JLabel infoCaixaGeradores = new JLabel("Gerar Valores:");
     private JTextField caixaEntradaGeradores = new JTextField();
 
     private JButton botaoAdicionar = new JButton("Adicionar");
     private JButton botaoLimpar = new JButton("Limpar");
-    private JButton botaoTirar= new JButton("Tirar ultimo");
-    
-    private JButton botaoFibonacci = new JButton("Fibonacci");
-    private JButton botaoNaturais = new JButton("Naturais");
-    private JButton botaoFatoriais = new JButton("Fatoriais");
+    private JButton botaoTirar = new JButton("Tirar ultimo");
+    private JButton botaoGerar = new JButton("Gerar");
 
     private JTable tabelaResultados;
     private JTable tabelaValores;
@@ -49,31 +51,27 @@ public class Calculadora extends JFrame{
 
     public Calculadora(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100,100,900,300);
+        setBounds(100,100,900,320);
         setTitle("Calculadora Estatística");
     
         setContentPane(painel);
         painel.setLayout(null);
         
-        painelEntrada.setBounds(15,80,280,173);
+        painelEntrada.setBounds(35,80,280,190);
+        painelEntrada.setBorder(BorderFactory.createTitledBorder("Digite um valor"));
         painelEntrada.setLayout(null);
         painel.add(painelEntrada);
         
-        painelGeradores.setBounds(550,100,300,200);
+        painelGeradores.setBounds(520,80,280,190);
+        painelGeradores.setBorder(BorderFactory.createTitledBorder("Gerar Valores"));
         painelGeradores.setLayout(null);
         painel.add(painelGeradores);
-        
-        infoCaixaEntrada.setBounds(30,30,200,15);
-        painelEntrada.add(infoCaixaEntrada);
         
         caixaEntrada.setBounds(30,50,200,20);
         caixaEntrada.setColumns(10);
         painelEntrada.add(caixaEntrada);
         
-        infoCaixaGeradores.setBounds(0,0,200,40);
-        painelGeradores.add(infoCaixaGeradores);
-        
-        caixaEntradaGeradores.setBounds(0,30,200,20);
+        caixaEntradaGeradores.setBounds(50,50,200,20);
         caixaEntradaGeradores.setColumns(10);
         painelGeradores.add(caixaEntradaGeradores);
         
@@ -86,14 +84,8 @@ public class Calculadora extends JFrame{
         botaoTirar.setBounds(77,145,117,25);
         painelEntrada.add(botaoTirar);
         
-        botaoFibonacci.setBounds(45,65,117,25);
-        painelGeradores.add(botaoFibonacci);
-        
-        botaoNaturais.setBounds(45,95,117,25);
-        painelGeradores.add(botaoNaturais);
-        
-        botaoFatoriais.setBounds(45,125,117,25);
-        painelGeradores.add(botaoFatoriais);
+        botaoGerar.setBounds(70,135,150,20);
+        painelGeradores.add(botaoGerar);
     
         painelScrollTabelaResultado.setBounds(10,10,880,50);
         painel.add(painelScrollTabelaResultado);
@@ -101,18 +93,27 @@ public class Calculadora extends JFrame{
         tabelaResultados = new JTable(resultados);
         painelScrollTabelaResultado.setViewportView(tabelaResultados);
         
-        painelScrollTabelaValores.setBounds(307,80,173,173);
+        painelScrollTabelaValores.setBounds(330,100,173,173);
         painel.add(painelScrollTabelaValores);
         
         tabelaValores = new JTable(valores);
         painelScrollTabelaValores.setViewportView(tabelaValores);
         
+        JComboBox<GerarTipo> comboBox = new JComboBox<GerarTipo>(GerarTipo.values());
+        comboBox.setBounds(70,90,150,20);
+        painelGeradores.add(comboBox);
+        
         botaoAdicionar.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent arg0){
-                valores.adicionarValor(Integer.parseInt(caixaEntrada.getText()));
-                resultados.atualizar();
-                caixaEntrada.setText("");
+                try{
+                    valores.adicionarValor(Integer.parseInt(caixaEntrada.getText()));
+                    resultados.atualizar();
+                    caixaEntrada.setText("");
+                    caixaEntradaGeradores.setText("");
+                }catch(NumberFormatException ex){
+                    JOptionPane.showMessageDialog(null,"Digite uma entrada válida!", "Erro ao ler valor",JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
         );
@@ -120,7 +121,11 @@ public class Calculadora extends JFrame{
         botaoLimpar.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent arg0){
-                valores.limpar();   
+                try {   
+                    valores.limpar();
+                } catch (CleanException ex) {
+                    JOptionPane.showMessageDialog(null, "Não há valores a serem removidos", "Erro ao limpar", JOptionPane.ERROR_MESSAGE);
+                }
                 resultados.atualizar();
                 caixaEntrada.setText("");   
                 caixaEntradaGeradores.setText("");
@@ -134,49 +139,30 @@ public class Calculadora extends JFrame{
         botaoTirar.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent arg0){
-                valores.tirar();
-                resultados.atualizar();
-                caixaEntrada.setText("");   
+                try{
+                    valores.tirar();
+                    resultados.atualizar();
+                    caixaEntrada.setText("");   
+                }catch(CleanException ex){
+                    JOptionPane.showMessageDialog(null,"Não há valores a serem removidos", "Erro ao limpar",JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
         );
         
-        botaoNaturais.addActionListener(new ActionListener(){
+        botaoGerar.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent arg0){
-                naturais.gerar(Integer.parseInt(caixaEntradaGeradores.getText())-1);
-                for(int i=0; i<naturais.getSequence().size(); i++){
-                    valores.adicionarValor(naturais.getSequence().get(i));
+                try{
+                    valores.gerar((GerarTipo)comboBox.getSelectedItem() , Integer.parseInt(caixaEntradaGeradores.getText()));
+                    resultados.atualizar();
+                    caixaEntradaGeradores.setText("");
+                    caixaEntrada.setText("");
+                }catch(NumberFormatException e){
+                    JOptionPane.showMessageDialog(null, "Digite uma entrada válida!", "Erro ao ler valor", JOptionPane.ERROR_MESSAGE);
                 }
-                resultados.atualizar();
-            } 
-        }
-        );
-        
-        botaoFibonacci.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent arg0){
-                fibonacci.gerar(Integer.parseInt(caixaEntradaGeradores.getText()));
-                for(int i=0; i<fibonacci.getSequence().size(); i++){
-                    valores.adicionarValor(fibonacci.getSequence().get(i));
-                }
-                resultados.atualizar();
             }
-        }
-        );
-        
-        botaoFatoriais.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent arg0){
-                fatoriais.gerar(Integer.parseInt(caixaEntradaGeradores.getText())-1);
-                for(int i=0; i<fatoriais.getSequence().size(); i++){
-                    valores.adicionarValor(fatoriais.getSequence().get(i));
-                }
-                resultados.atualizar();
-            }
-        }
-        );
-        
+        });
     }
     
     public static void main(String[] args){
