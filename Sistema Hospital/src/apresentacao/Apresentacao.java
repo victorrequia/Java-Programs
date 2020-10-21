@@ -17,6 +17,7 @@ public class Apresentacao extends JFrame{
     private final PainelMedico painelMedico = new PainelMedico();
     private final PainelPaciente painelPaciente = new PainelPaciente();
     private final PainelLogin painelLogin = new PainelLogin();
+    private final PainelCreditos painelCreditos = new PainelCreditos();
     
     public Apresentacao(){
         Image iconeJanela = Toolkit.getDefaultToolkit().getImage("images/iconeJanela.png");
@@ -32,6 +33,7 @@ public class Apresentacao extends JFrame{
         tabbedcontainer.addTab("Consultas", new ImageIcon("images/consulta.png"), painelConsulta);
         tabbedcontainer.addTab("Medicos", new ImageIcon("images/medico.png"),painelMedico);
         tabbedcontainer.addTab("Pacientes",new ImageIcon("images/paciente.png"), painelPaciente);
+        tabbedcontainer.addTab("Creditos", new ImageIcon("images/creditos.png"), painelCreditos);
     }
     
     public static void main(String[] args){

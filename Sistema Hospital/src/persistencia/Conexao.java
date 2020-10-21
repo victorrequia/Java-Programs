@@ -12,7 +12,8 @@ public class Conexao {
     private Conexao(){};
     
     public static Connection getConexao() throws ClassNotFoundException, SQLException{
-        if(conexao == null){
+        try{
+            if(conexao == null){
             String url = "jdbc:postgresql://localhost:5432/consultorio";
             String usuario = "postgres";
             
@@ -20,6 +21,10 @@ public class Conexao {
             conexao = DriverManager.getConnection(url, usuario, senha);
         }
         return conexao;
+        }catch(Exception e){
+            
+        }
+        return null;
     }
     
     public static void setSenha(String password){

@@ -50,7 +50,7 @@ public class PainelLogin extends JPanel{
         painelLogin.setBorder(BorderFactory.createTitledBorder(""));
         telaLogin.add(painelLogin);
         
-        JLabel imagemLogin = new JLabel(new ImageIcon("images/login.png"));
+        JLabel imagemLogin = new JLabel(new ImageIcon("images/iconeLogin.png"));
         imagemLogin.setBounds(-20, 30, 300, 200);
         telaLogin.add(imagemLogin);
         
